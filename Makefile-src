@@ -1,0 +1,43 @@
+include $(TOPDIR)/rules.mk
+
+PKG_NAME:=dnsforwarder
+PKG_VERSION:=6
+PKG_RELEASE:=1
+PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)
+
+
+include $(INCLUDE_DIR)/package.mk
+
+define Package/dnsforwarder
+  SECTION:=net
+  CATEGORY:=Network
+  TITLE:=A simple DNS forwarder
+  URL:=https://github.com/holmium/dnsforwarder
+  DEPENDS:=+wget
+endef
+
+define Package/dnsforwarder/description
+Forwarding queries to customized domains (and their subdomains) to specified servers over a specified protocol (UDP or TCP). non-standard ports are supported.
+endef
+
+define Build/Prepare
+	mkdir -p $(PKG_BUILD_DIR)
+	$(CP) ./src/* $(PKG_BUILD_DIR)/
+endef
+
+define Package/dnsforwarder/conffiles
+/etc/dnsforwarder.conf
+endef
+
+
+CONFIGURE_ARGS += --enable-downloader=wget
+
+
+define Package/dnsforwarder/install
+	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/dnsforwarder $(1)/usr/bin/dnsforwarder
+	$(INSTALL_DIR) $(1)/etc
+	$(INSTALL_CONF) $(PKG_BUILD_DIR)/default.config $(1)/etc/dnsforwarder.conf
+endef
+
+$(eval $(call BuildPackage,dnsforwarder))
