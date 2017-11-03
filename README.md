@@ -62,6 +62,12 @@ make package/dnsforwarder/compile V=99
 
 截图
 ---
+![demo](https://github.com/AlexZhuo/openwrt-dnsforwarder/raw/master/screencapture-192-168-167-101-cgi-bin-luci-admin-services-dnsforwarder-1509669292068.png)
+
+![demo](https://github.com/AlexZhuo/openwrt-dnsforwarder/raw/master/screencapture-192-168-167-102-cgi-bin-luci-admin-services-dnsforwarder-gfwlist-1509575828363.png)
+
+![demo](https://github.com/AlexZhuo/openwrt-dnsforwarder/raw/master/screencapture-192-168-167-101-cgi-bin-luci-admin-services-dnsforwarder-log-1509669318124.png)
+
 
 
 
