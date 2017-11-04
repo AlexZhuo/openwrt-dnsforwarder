@@ -1,6 +1,6 @@
 #!/bin/sh /etc/rc.common
 
-START=99
+START=97
 
 DNSFORWARDER_CONF=/etc/dnsforwarder/dnsforwarder.conf
 PID_PATH=/var/run/dnsforwarder/
@@ -16,9 +16,8 @@ start()
 	fi 
 	dnsforwarder -f $DNSFORWARDER_CONF -d
 	mkdir -p $PID_PATH
-	ps | grep dnsforwarder
 	pid=`ps | awk '$5 ~ /\[dnsforwarder\]/ {print $1}'`
-	echo $pid
+	echo dnsforwarder running pid is $pid
 	logger -t alex the pid of dnsforwarder is $PID_PATH/$PID_FILE $pid
 	echo $pid > $PID_PATH/$PID_FILE
 	/etc/init.d/dnsforwarder enable
@@ -42,9 +41,14 @@ start()
 	fi
 
 	mkdir -p /tmp/dnsmasq.d
+	mkdir -p /etc/dnsmasq.d
 	cat > /tmp/dnsmasq.d/dnsmasq-go.conf <<EOF
 conf-dir=/var/etc/dnsmasq-go.d
 EOF
+	cat > /etc/dnsmasq.d/dnsmasq-go.conf <<EOF
+conf-dir=/var/etc/dnsmasq-go.d
+EOF
+
 	if [ $ipset = 1 ]; then
 		ipset destroy $ipset_name 2>/dev/null
 		ipset create $ipset_name hash:net family inet hashsize 1024 maxelem 65536
@@ -103,7 +107,6 @@ EOF
 		if [ $white = 1 ]; then
 			logger -t alex enable white list
 			echo enable white list
-			echo whiteset first is $whiteset
 			[ -z "$whiteset" ] && whiteset="whiteset"
 			[ -n "$whitedns" ] && [ -f "/etc/dnsforwarder/whitelist" ] && { #强制不走代理到DNSMasq
 					echo whiteset is $whiteset
@@ -138,6 +141,7 @@ stop()
 	[ -e $PID_PATH/$PID_FILE ] && {
 		pid=`cat $PID_PATH/$PID_FILE`
 		logger -t alex killing dnsforwarder pid $pid
+		echo killing dnsforwarder pid $pid
 		kill $pid
 		rm -f $PID_PATH/$PID_FILE
 	} || {
@@ -149,7 +153,7 @@ stop()
 	local ipset=`uci get dnsforwarder.@arguments[0].ipset 2>/dev/null`
 	local ipset_name=`uci get dnsforwarder.@arguments[0].ipset_name 2>/dev/null`
 	[ $ipset = 1 ] && {
-		echo destroying ipset
+		echo destroying ipset $ipset_name
 		ipset destroy $ipset_name 2>/dev/null
 	}
 	local white=`uci get dnsforwarder.@arguments[0].white 2>/dev/null`
@@ -162,12 +166,9 @@ restart()
 {
 	
 	pid=`cat $PID_PATH/$PID_FILE 2>/dev/null`
-	pid2=`pidof dnsforwarder | awk '{print $3}'`  #第一个是当前pidof进程，第二个是这个init文件，第三个才是主要进程
-	echo pid2 is $pid2
-	[ $pid -eq $pid2 ] && {
-		logger -t alex good stop
-	}
+	echo dnsforwarder pid file is $pid
 	[ -n "$pid" ] && {
+		echo stopping pid $pid
 		logger -t alex there is dnsforwarder pid $pid
 		stop
 	} || {
@@ -175,7 +176,7 @@ restart()
 	}
 	sleep 1s	
 	local vt_enabled=`uci get dnsforwarder.@arguments[0].enabled 2>/dev/null`
-	echo $vt_enabled 
+	echo dnsforwarder status is $vt_enabled 
 	logger -t alex dnsforwarder is initializing enabled is $vt_enabled
 	if [ $vt_enabled = 1 ]; then
 		[ -n "$pid" ] && {
