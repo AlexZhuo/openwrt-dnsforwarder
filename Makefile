@@ -10,6 +10,7 @@ PKG_SOURCE_SUBDIR:=$(PKG_NAME)-$(PKG_VERSION)
 PKG_SOURCE_VERSION:=90c86f91f02d0e31ca32b67899d734b3072260bf
 PKG_BUILD_DIR:=$(BUILD_DIR)/$(PKG_NAME)-6
 
+PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.xz
 
 
 include $(INCLUDE_DIR)/package.mk
@@ -19,7 +20,7 @@ define Package/dnsforwarder
   CATEGORY:=Network
   TITLE:=A simple DNS forwarder
   URL:=https://github.com/holmium/dnsforwarder
-  DEPENDS:=+wget +ipset +dnsmasq-full
+  DEPENDS:=+wget +ipset +dnsmasq-full +libpthread
 endef
 
 define Package/dnsforwarder/description
