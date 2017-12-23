@@ -20,7 +20,7 @@ define Package/dnsforwarder
   CATEGORY:=Network
   TITLE:=A simple DNS forwarder
   URL:=https://github.com/holmium/dnsforwarder
-  DEPENDS:=+wget +ipset +dnsmasq-full +libpthread
+  DEPENDS:=+wget +ipset +dnsmasq-full +libpthread +coreutils-base64
 endef
 
 define Package/dnsforwarder/description
